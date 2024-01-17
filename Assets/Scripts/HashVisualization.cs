@@ -15,10 +15,35 @@ public class HashVisualization : MonoBehaviour
         [WriteOnly]
         public NativeArray<uint> hashes;
 
+        public int resolution;
+
+        // inverse resolution/reciprocal
+        public float invResolution;
+
         public void Execute(int i)
         {
-            hashes[i] = (uint)i;
+            // use uv coordinates to create an independent resolution
+            // rather than just using index i
+            // note that this is the same formula in getting uv coords in HLSL
+            float v = floor(invResolution * i + 0.00001f);
+            float u = i - resolution * v;
+
+            // use Weyl's sequencing rather than a gradient
+            hashes[i] = (uint)(frac(u * v * 0.381f) * 256f);
         }
+    }
+
+    /**
+     * A variant of the xxHash constants by Yann Collet.
+     * Skips the algorithms steps 2, 3, and 4.
+     */
+    public struct SmallXXHash
+    {
+        const uint primeA = 0b10011110001101110111100110110001;
+        const uint primeB = 0b10000101111010111100101001110111;
+        const uint primeC = 0b11000010101100101010111000111101;
+        const uint primeD = 0b00100111110101001110101100101111;
+        const uint primeE = 0b00010110010101100110011110110001;
     }
 
     static int
@@ -42,7 +67,9 @@ public class HashVisualization : MonoBehaviour
 
         new HashJob
         {
-            hashes = hashes
+            hashes = hashes,
+            resolution = resolution,
+            invResolution = 1f / resolution
         }.ScheduleParallel(hashes.Length, resolution, default).Complete();
 
         hashesBuffer.SetData(hashes);

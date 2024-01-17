@@ -2,6 +2,9 @@
 	StructuredBuffer<uint> _Hashes;
 #endif
 
+// derive the instance's position from its identifier
+
+
 // converts a 1D line to 2D grid
 
 // example:
@@ -28,7 +31,9 @@ void ConfigureProcedural () {
 	#if defined(UNITY_PROCEDURAL_INSTANCING_ENABLED)
 		// get coordinates u and v
 		// simulate integer division by floor of (float < 1) * int
-		float v = floor(_Config.y * unity_InstanceID);
+		// add a positive bias (+ 0.00001) before discarding the fractional part to avoid 
+		// point precision limits
+		float v = floor(_Config.y * unity_InstanceID + 0.00001);
 		float u = unity_InstanceID - _Config.x * v;
 
 		unity_ObjectToWorld = 0.0;
@@ -48,7 +53,10 @@ void ConfigureProcedural () {
 float3 GetHashColor () {
 	#if defined(UNITY_PROCEDURAL_INSTANCING_ENABLED)
 		uint hash = _Hashes[unity_InstanceID];
-		return _Config.y * _Config.y * hash;
+		return (1.0 / 255.0) * (hash & 255);
+
+		// divides the hash by resolution^2
+		// return _Config.y * _Config.y * hash;
 	#else
 		return 1.0;
 	#endif
