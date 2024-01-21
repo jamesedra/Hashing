@@ -7,4 +7,4 @@ Hash method used is a partial variant of the xxHash algorithm by Yann Collet and
 
 
 ### Note:
-This is a short case study replicated for studying different pseudorandom patterns using Unity 3D.
+This is a short case study replicated for visualizing different pseudorandom patterns using Unity 3D.
