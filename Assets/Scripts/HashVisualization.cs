@@ -25,12 +25,18 @@ public class HashVisualization : MonoBehaviour
             // use uv coordinates to create an independent resolution
             // rather than just using index i
             // note that this is the same formula in getting uv coords in HLSL
-            float v = floor(invResolution * i + 0.00001f);
-            float u = i - resolution * v;
+            int v = (int)floor(invResolution * i + 0.00001f);
+            int u = i - resolution * v;
 
             var hash = new SmallXXHash(0);
+            hash.Eat(u);
+            hash.Eat(v);
+
             // use Weyl's sequencing rather than a gradient
-            hashes[i] = (uint)(frac(u * v * 0.381f) * 256f);
+            // hashes[i] = (uint)(frac(u * v * 0.381f) * 256f);
+
+            // use smallXXHash
+            hashes[i] = hash;
         }
     }
 

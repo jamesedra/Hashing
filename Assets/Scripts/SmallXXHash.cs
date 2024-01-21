@@ -19,9 +19,33 @@ public struct SmallXXHash
         accumulator = (uint)seed + primeE;
     }
 
-    // get final uint hash value and return the accumulator
-    // implicit to directly assign a SmallXXHash value to a uint and convert implicitly
-    //without having to write uint infront of it
-    public static implicit operator uint(SmallXXHash hash) => hash.accumulator;
+    // use avalanche effect, XXHash algorithm to mix the bits of the accumulator
+    public static implicit operator uint(SmallXXHash hash)
+    {
+        uint avalanche = hash.accumulator;
+        avalanche ^= avalanche >> 15;
+        avalanche *= primeB;
+        avalanche ^= avalanche >> 13;
+        avalanche *= primeC;
+        avalanche ^= avalanche >> 16;
+        return avalanche;
+    }
+
+
+    public void Eat (int data)
+    {
+        accumulator = RotateLeft(accumulator + (uint)data * primeC, 17) * primeD;
+    }
+
+    // other variant of Eat
+    public void Eat(byte data)
+    {
+        accumulator = RotateLeft(accumulator + data * primeE, 11) * primeA;
+    }
+
+    // vectcorized rotate left instruction
+    // use bitshifting and place the overflow data to the back using OR
+    static uint RotateLeft(uint data, int steps) => 
+        (data << steps) | (data >> 32 - steps);
 }
 
