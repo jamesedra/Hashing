@@ -39,9 +39,10 @@ void ConfigureProcedural () {
 		unity_ObjectToWorld = 0.0;
 
 		// place the instance on the XZ plane ** float4(x,y,z,a), keep Y value 0
+		// use the last byte of the hash as a pseudorandom vertical displacement
 		unity_ObjectToWorld._m03_m13_m23_m33 = float4(
 			_Config.y * (u + 0.5) - 0.5,
-			0.0,
+			_Config.z * ((1.0 / 255.0) * (_Hashes[unity_InstanceID] >> 24) - 0.5),
 			_Config.y * (v + 0.5) - 0.5,
 			1.0
 		);
@@ -53,7 +54,11 @@ void ConfigureProcedural () {
 float3 GetHashColor () {
 	#if defined(UNITY_PROCEDURAL_INSTANCING_ENABLED)
 		uint hash = _Hashes[unity_InstanceID];
-		return (1.0 / 255.0) * (hash & 255);
+		return (1.0 / 255.0) * float3(
+			hash & 255,
+			(hash >> 8) & 255,
+			(hash >> 16) & 255
+		);
 
 		// divides the hash by resolution^2
 		// return _Config.y * _Config.y * hash;

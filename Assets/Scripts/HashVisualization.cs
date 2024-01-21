@@ -14,11 +14,11 @@ public class HashVisualization : MonoBehaviour
     {
         [WriteOnly]
         public NativeArray<uint> hashes;
-
         public int resolution;
-
         // inverse resolution/reciprocal
         public float invResolution;
+        public int seed;
+        public SmallXXHash hash;
 
         public void Execute(int i)
         {
@@ -32,7 +32,7 @@ public class HashVisualization : MonoBehaviour
             // hashes[i] = (uint)(frac(u * v * 0.381f) * 256f);
 
             // use smallXXHash
-            hashes[i] = SmallXXHash.Seed(0).Eat(u).Eat(v);
+            hashes[i] = hash.Eat(u).Eat(v);
         }
     }
 
@@ -43,6 +43,8 @@ public class HashVisualization : MonoBehaviour
     [SerializeField] Mesh instanceMesh;
     [SerializeField] Material material;
     [SerializeField, Range(1, 512)] int resolution = 16;
+    [SerializeField] int seed; // changes the seed for the xxhash method
+    [SerializeField, Range(-2f, 2f)] float verticalOffset = 1f;
 
     NativeArray<uint> hashes;
 
@@ -59,14 +61,15 @@ public class HashVisualization : MonoBehaviour
         {
             hashes = hashes,
             resolution = resolution,
-            invResolution = 1f / resolution
+            invResolution = 1f / resolution,
+            hash = SmallXXHash.Seed(seed)
         }.ScheduleParallel(hashes.Length, resolution, default).Complete();
 
         hashesBuffer.SetData(hashes);
 
         propertyBlock ??= new MaterialPropertyBlock();
         propertyBlock.SetBuffer(hashesId, hashesBuffer);
-        propertyBlock.SetVector(configId, new Vector4(resolution, 1f / resolution));
+        propertyBlock.SetVector(configId, new Vector4(resolution, 1f / resolution, verticalOffset / resolution));
     }
 
     private void OnDisable()
