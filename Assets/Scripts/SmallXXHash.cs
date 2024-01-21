@@ -2,7 +2,7 @@
   * A variant of the xxHash constants by Yann Collet.
   * Skips the algorithms steps 2, 3, and 4.
   */
-public struct SmallXXHash
+public readonly struct SmallXXHash
 {
     const uint primeA = 0b10011110001101110111100110110001;
     const uint primeB = 0b10000101111010111100101001110111;
@@ -11,13 +11,18 @@ public struct SmallXXHash
     const uint primeE = 0b00010110010101100110011110110001;
 
     // store hashbits in an accumulator
-    uint accumulator;
+    readonly uint accumulator;
 
-    public SmallXXHash(int seed)
+    public SmallXXHash(uint accumulator)
     {
         // initialize accumulator  with a seed number + prime E
-        accumulator = (uint)seed + primeE;
+        this.accumulator = accumulator;
     }
+
+    public static implicit operator SmallXXHash(uint accumulator) =>
+        new SmallXXHash(accumulator);
+
+    public static SmallXXHash Seed(int seed) => (uint)seed + primeE;
 
     // use avalanche effect, XXHash algorithm to mix the bits of the accumulator
     public static implicit operator uint(SmallXXHash hash)
@@ -31,17 +36,11 @@ public struct SmallXXHash
         return avalanche;
     }
 
-
-    public void Eat (int data)
-    {
-        accumulator = RotateLeft(accumulator + (uint)data * primeC, 17) * primeD;
-    }
+    public SmallXXHash Eat (int data) =>
+        RotateLeft(accumulator + (uint)data * primeC, 17) * primeD;
 
     // other variant of Eat
-    public void Eat(byte data)
-    {
-        accumulator = RotateLeft(accumulator + data * primeE, 11) * primeA;
-    }
+    public SmallXXHash Eat(byte data) => RotateLeft(accumulator + data * primeE, 11) * primeA;
 
     // vectcorized rotate left instruction
     // use bitshifting and place the overflow data to the back using OR

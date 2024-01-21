@@ -28,15 +28,11 @@ public class HashVisualization : MonoBehaviour
             int v = (int)floor(invResolution * i + 0.00001f);
             int u = i - resolution * v;
 
-            var hash = new SmallXXHash(0);
-            hash.Eat(u);
-            hash.Eat(v);
-
             // use Weyl's sequencing rather than a gradient
             // hashes[i] = (uint)(frac(u * v * 0.381f) * 256f);
 
             // use smallXXHash
-            hashes[i] = hash;
+            hashes[i] = SmallXXHash.Seed(0).Eat(u).Eat(v);
         }
     }
 
