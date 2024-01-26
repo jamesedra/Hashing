@@ -462,6 +462,19 @@ MonoBehaviour:
   resolution: 32
   seed: 0
   verticalOffset: 1
+  domain:
+    translation:
+      x: 0
+      y: 0
+      z: 0
+    rotation:
+      x: 0
+      y: 0
+      z: 0
+    scale:
+      x: 8
+      y: 8
+      z: 8
 --- !u!4 &1359106975
 Transform:
   m_ObjectHideFlags: 0
