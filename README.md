@@ -7,7 +7,7 @@ Hash method used is a partial variant of the xxHash algorithm by Yann Collet and
 
 <img src="/Assets/PNG/DomainTRS.gif" alt="Hashing Visualization" style="width: 90%"> 
 
-Domain TRS is added to manipulate the hashed plane's shape to study more about transformations.
+Domain TRS is added to manipulate the plane's shape to study more about custom transformations.
 
 ### Note:
 This is a short case study replicated for visualizing different pseudorandom patterns using Unity 3D.
