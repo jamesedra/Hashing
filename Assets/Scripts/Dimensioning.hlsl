@@ -1,5 +1,6 @@
 #if defined(UNITY_PROCEDURAL_INSTANCING_ENABLED)
 	StructuredBuffer<uint> _Hashes;
+	StructuredBuffer<float3> _Positions, _Normals;
 #endif
 
 // derive the instance's position from its identifier
@@ -29,23 +30,36 @@ float4 _Config;
 
 void ConfigureProcedural () {
 	#if defined(UNITY_PROCEDURAL_INSTANCING_ENABLED)
+		// MAKING UV POSITIONS HERE ARE OMMITED FOR _Positions
 		// get coordinates u and v
 		// simulate integer division by floor of (float < 1) * int
 		// add a positive bias (+ 0.00001) before discarding the fractional part to avoid 
 		// point precision limits
-		float v = floor(_Config.y * unity_InstanceID + 0.00001);
-		float u = unity_InstanceID - _Config.x * v;
+		// float v = floor(_Config.y * unity_InstanceID + 0.00001);
+		// float u = unity_InstanceID - _Config.x * v;
 
 		unity_ObjectToWorld = 0.0;
 
 		// place the instance on the XZ plane ** float4(x,y,z,a), keep Y value 0
 		// use the last byte of the hash as a pseudorandom vertical displacement
 		unity_ObjectToWorld._m03_m13_m23_m33 = float4(
-			_Config.y * (u + 0.5) - 0.5,
-			_Config.z * ((1.0 / 255.0) * (_Hashes[unity_InstanceID] >> 24) - 0.5),
-			_Config.y * (v + 0.5) - 0.5,
+
+			// position replacement
+			// _Config.y * (u + 0.5) - 0.5,
+			// _Config.z * ((1.0 / 255.0) * (_Hashes[unity_InstanceID] >> 24) - 0.5),
+			// _Config.y * (v + 0.5) - 0.5,
+
+			_Positions[unity_InstanceID],
 			1.0
 		);
+		// unity_ObjectToWorld._m00_m11_m22 = _Config.y;
+
+		
+		unity_ObjectToWorld._m03_m13_m23 += 
+		(_Config.z * ((1.0 / 255.0) * (_Hashes[unity_InstanceID] >> 24) - 0.5)) * 
+		_Normals[unity_InstanceID];
+		
+		// apply vertical offset
 		unity_ObjectToWorld._m00_m11_m22 = _Config.y;
 	#endif
 }
