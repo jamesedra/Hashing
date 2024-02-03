@@ -35,13 +35,14 @@ public class HashVisualization : MonoBehaviour
             float3 p = mul(domainTRS, float4(uf, 0f, vf, 1f));
 
             int u = (int)floor(p.x);
-            int v = (int)floor(p.z);
+            int v = (int)floor(p.y);
+            int w = (int)floor(p.z);
 
             // use Weyl's sequencing rather than a gradient
             // hashes[i] = (uint)(frac(u * v * 0.381f) * 256f);
 
             // use smallXXHash
-            hashes[i] = hash.Eat(u).Eat(v);
+            hashes[i] = hash.Eat(u).Eat(v).Eat(w);
         }
     }
 
@@ -115,9 +116,10 @@ public class HashVisualization : MonoBehaviour
     {
         /*
          * Testing purposes
+
+        */
         domain.rotation.y += 10f * Time.deltaTime;
         Refresh();
-        */
 
 
         // draws the hash
